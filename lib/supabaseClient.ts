@@ -1,7 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+'use client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
-// Singleton pattern: ensure we don't create multiple clients in hot reload / SSR
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserSupabaseClient({
+  // These must match what you’ve set in Vercel (and in .env.local)
+  supabaseUrl:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  supabaseKey:  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+});
+
