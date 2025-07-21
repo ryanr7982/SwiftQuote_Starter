@@ -1,7 +1,8 @@
 // pages/api/saveQuote.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
-import type { QuoteItem } from '@/types/quotes';
+import type { QuoteItem } from '@/types';  // assumes you have types/index.ts exporting QuoteItem
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,21 +14,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { id, user_id, client_name, title, items, total, content } = req.body;
+  const { id, user_id, client_name, title, items, total, content } = req.body as {
+    id?: string;
+    user_id: string;
+    client_name: string;
+    title: string;
+    items: QuoteItem[];
+    total: number;
+    content: string;
+  };
 
-  if (!user_id || !client_name || !title || !items || !total || content === undefined) {
+  // Validate required fields
+  if (!user_id || !client_name || !title || !items?.length || total == null || content === undefined) {
     return res.status(400).json({ message: 'Missing fields' });
   }
 
   // 1. Upsert client (insert or return existing)
   const { data: clientData, error: clientError } = await supabase
     .from('clients')
-    .upsert([{ name: client_name, user_id }], { onConflict: ['name', 'user_id'] })
-    .select()
+    .upsert(
+      [{ name: client_name, user_id }],
+      { onConflict: 'name,user_id' }  // <-- comma‑separated string
+    )
+    .select('*')
     .single();
 
   if (clientError || !clientData) {
-    console.error('Client insert/upsert error:', clientError);
+    console.error('Client upsert error:', clientError);
     return res.status(500).json({ message: 'Failed to insert or find client' });
   }
 
@@ -39,21 +52,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .from('quotes')
       .update({ user_id, client_id: clientData.id, title, total, content })
       .eq('id', id)
-      .select()
+      .select('*')
       .single();
     if (error || !data) {
       console.error('Quote update error:', error);
       return res.status(500).json({ message: 'Failed to update quote' });
     }
     quoteData = data;
-    // Remove old items before re-inserting new ones
+    // Remove old items before re‑inserting new ones
     await supabase.from('quote_items').delete().eq('quote_id', id);
   } else {
     // Creating new quote
     const { data, error } = await supabase
       .from('quotes')
       .insert([{ user_id, client_id: clientData.id, title, total, content }])
-      .select()
+      .select('*')
       .single();
     if (error || !data) {
       console.error('Quote insert error:', error);
@@ -68,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     item: i.item,
     quantity: i.quantity,
     width_height: i.width_height,
-    price: i.price
+    price: i.price,
   }));
 
   if (quoteItemsPayload.length) {
@@ -81,8 +94,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  return res.status(200).json({ message: 'Quote and items saved successfully!' });
+  return res.status(200).json({
+    message: 'Quote and items saved successfully!',
+    quoteId: quoteData.id,
+  });
 }
+
 
 
 
