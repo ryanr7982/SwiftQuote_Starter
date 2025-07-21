@@ -1,4 +1,3 @@
-// pages/dashboard.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -130,7 +129,7 @@ function EditQuoteModal({
           <button type="button" onClick={addItem} className="bg-blue-600 text-white px-3 py-1 rounded">➕ Add Row</button>
           <span className="font-semibold text-lg">Total: ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
         </div>
-        <div className="flex gap-2 justify-end">
+        <div className="flex gap 2 justify-end">
           <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Cancel</button>
           <button onClick={handleSave} className="px-4 py-2 rounded bg-green-600 text-white">💾 Save</button>
         </div>
@@ -160,21 +159,26 @@ export default function DashboardPage() {
     const { data, error } = await supabase
       .from('quotes')
       .select(`
-        id, 
+        id,
         user_id,
-        title, 
-        total, 
-        created_at, 
+        title,
+        total,
+        created_at,
         content,
-        clients(name), 
+        clients(name),
         quote_items(item, quantity, width_height, price)
       `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setQuotes(data);
-      setFiltered(data);
+      // Supabase returns clients as an array — extract the first element
+      const formatted: Quote[] = data.map((q: any) => ({
+        ...q,
+        clients: q.clients?.[0] ?? { name: '' },
+      }));
+      setQuotes(formatted);
+      setFiltered(formatted);
     }
   };
 
@@ -206,7 +210,6 @@ export default function DashboardPage() {
     }
   };
 
-  // After editing a quote and saving
   const handleSaveEditedQuote = (updatedQuote: Quote) => {
     setQuotes(prev =>
       prev.map(q => (q.id === updatedQuote.id ? updatedQuote : q))
@@ -214,7 +217,7 @@ export default function DashboardPage() {
     setFiltered(prev =>
       prev.map(q => (q.id === updatedQuote.id ? updatedQuote : q))
     );
-    fetchQuotes(); // To fully sync
+    fetchQuotes();
   };
 
   return (
@@ -291,7 +294,7 @@ export default function DashboardPage() {
                 <strong>Notes:</strong><br />
                 {typeof quote.content === 'string'
                   ? quote.content
-                  : quote.content.text || ''}
+                  : (quote.content as any).text || ''}
               </div>
             )}
             {/* QUOTE ITEMS TABLE */}
@@ -377,6 +380,7 @@ export default function DashboardPage() {
     </main>
   );
 }
+
 
 
 
