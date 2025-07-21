@@ -373,7 +373,7 @@ export default function DashboardPage() {
         <div className="max-w-2xl mx-auto mt-12">
           <CreateQuoteForm
             userId={user.id}
-            onSaved={fetchQuotes}
+            
           />
         </div>
       )}
