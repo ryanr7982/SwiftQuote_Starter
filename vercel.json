@@ -1,0 +1,14 @@
+
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.tsx" }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://wfygfrqbyjglqhtcpsvv.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmeWdmcnFieWpnbHFodGNwc3Z2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1NDUxNTcsImV4cCI6MjA2NzEyMTE1N30.V6cvF7kkNIIwwnesWhNRZQiX-APKxRl55yjgG7qxNXA",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmeWdmcnFieWpnbHFodGNwc3Z2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTU0NTE1NywiZXhwIjoyMDY3MTIxMTU3fQ.8k9SRcFKRtA03Xn0vsV8Ose7IkszJo4TI-WKiPdJ_UY",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "YOUR_STRIPE_PUB_KEY",
+    "STRIPE_SECRET_KEY": "YOUR_STRIPE_SECRET_KEY",
+    "GUMROAD_PRODUCT_ID": "YOUR_GUMROAD_PRODUCT_ID"
+  }
+}
