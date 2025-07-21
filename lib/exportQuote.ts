@@ -47,14 +47,23 @@ export function exportQuoteAsPDF(quote: any) {
 }
 
 export function exportQuoteAsCSV(quote: any) {
+  // define the shape of each quote item for strong typing
+  type QuoteItem = {
+    item: string;
+    quantity: number;
+    width_height: string;
+    price: number;
+  };
+
   const header = ['Item', 'Qty', 'W x H', 'Price', 'Extended Price'];
-  const rows = (quote.quote_items || []).map(i => [
+  const rows = (quote.quote_items as QuoteItem[] || []).map((i: QuoteItem) => [
     i.item,
-    i.quantity,
+    i.quantity.toString(),
     i.width_height,
-    i.price?.toFixed(2) ?? '',
-    ((i.quantity || 0) * (i.price || 0)).toFixed(2),
+    i.price.toFixed(2),
+    (i.quantity * i.price).toFixed(2),
   ]);
+
   const csv = [
     header.join(','),
     ...rows.map(r => r.join(',')),
@@ -68,7 +77,6 @@ export function exportQuoteAsCSV(quote: any) {
   a.click();
   URL.revokeObjectURL(url);
 }
-
 
 export function exportAllQuotesAsCSV(quotes: any[]) {
   const header = ['Title', 'Client', 'Date', 'Total', 'Content'];
@@ -106,4 +114,5 @@ export function exportAllQuotesAsCSV(quotes: any[]) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
 
